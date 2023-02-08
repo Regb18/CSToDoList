@@ -1,8 +1,11 @@
+using CSAddressBook.Models;
+using CSAddressBook.Services;
 using CSToDoList.Data;
 using CSToDoList.Models;
 using CSToDoList.Services;
 using CSToDoList.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,8 +21,9 @@ builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireCo
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped<IToDoListService, ToDoListService>();
+//builder.Services.AddScoped<IEmailSender, EmailService>();
 
-
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddMvc();
 
