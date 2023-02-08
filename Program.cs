@@ -1,5 +1,3 @@
-using CSAddressBook.Models;
-using CSAddressBook.Services;
 using CSToDoList.Data;
 using CSToDoList.Models;
 using CSToDoList.Services;

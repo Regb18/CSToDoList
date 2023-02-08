@@ -1,4 +1,4 @@
-﻿namespace CSAddressBook.Models
+﻿namespace CSToDoList.Models
 {
     public class MailSettings
     {
