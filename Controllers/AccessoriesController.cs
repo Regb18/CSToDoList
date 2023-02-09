@@ -27,20 +27,31 @@ namespace CSToDoList.Controllers
         // GET: Accessories
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Accessories.Include(a => a.AppUser);
-            return View(await applicationDbContext.ToListAsync());
+            string userId = _userManager.GetUserId(User)!;
+
+            List<Accessory> accessories = new List<Accessory>();
+
+            accessories = await _context.Accessories
+                         .Where(c => c.AppUserId == userId)
+                         .Include(c => c.ToDoItems)
+                         .ToListAsync();
+
+            return View(accessories);
         }
 
         // GET: Accessories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            string userId = _userManager.GetUserId(User)!;
+
             if (id == null || _context.Accessories == null)
             {
                 return NotFound();
             }
 
             var accessory = await _context.Accessories
-                .Include(a => a.AppUser)
+                .Where(c => c.AppUserId == userId)
+                .Include(c => c.ToDoItems)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (accessory == null)
             {
@@ -80,17 +91,22 @@ namespace CSToDoList.Controllers
         // GET: Accessories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            string userId = _userManager.GetUserId(User)!;
+
             if (id == null || _context.Accessories == null)
             {
                 return NotFound();
             }
 
-            var accessory = await _context.Accessories.FindAsync(id);
+            var accessory = await _context.Accessories
+                                          .Where(c => c.AppUserId == userId)
+                                          .FirstOrDefaultAsync(m => m.Id == id);
+            
             if (accessory == null)
             {
                 return NotFound();
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", accessory.AppUserId);
+
             return View(accessory);
         }
 
@@ -101,6 +117,8 @@ namespace CSToDoList.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserId,Name")] Accessory accessory)
         {
+            ModelState.Remove("AppUserId");
+
             if (id != accessory.Id)
             {
                 return NotFound();
@@ -110,6 +128,8 @@ namespace CSToDoList.Controllers
             {
                 try
                 {
+                    accessory.AppUserId = _userManager.GetUserId(User);
+
                     _context.Update(accessory);
                     await _context.SaveChangesAsync();
                 }
@@ -133,14 +153,17 @@ namespace CSToDoList.Controllers
         // GET: Accessories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            string userId = _userManager.GetUserId(User)!;
+
             if (id == null || _context.Accessories == null)
             {
                 return NotFound();
             }
 
             var accessory = await _context.Accessories
-                .Include(a => a.AppUser)
+                .Where(c => c.AppUserId == userId)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (accessory == null)
             {
                 return NotFound();
@@ -154,6 +177,7 @@ namespace CSToDoList.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+
             if (_context.Accessories == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Accessories'  is null.");
