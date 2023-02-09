@@ -5,9 +5,15 @@
 }
 
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div class="row mb-3">
+    <div class="col text-start">
+        <a asp-action="Create">Create New</a>
+    </div>
+    <div class="col text-start">
+        <a asp-action="CompletedItems">Completed Items</a>
+    </div>
+</div>
+
 <table class="table">
     <thead>
         <tr>
@@ -31,6 +37,11 @@
     <tbody>
         @foreach (var item in Model)
         {
+            @if (item.Completed == true)
+            {
+                
+            } else
+            {                
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
@@ -62,6 +73,8 @@
                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                 </td>
             </tr>
+            }
+
         }
     </tbody>
 </table>

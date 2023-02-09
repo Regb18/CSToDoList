@@ -41,6 +41,21 @@ namespace CSToDoList.Controllers
             return View(toDoItems);
         }
 
+        // GET: CompletedItems
+        public async Task<IActionResult> CompletedItems()
+        {
+            string userId = _userManager.GetUserId(User)!;
+
+            List<ToDoItem> toDoItems = new List<ToDoItem>();
+
+            toDoItems = await _context.ToDoItem
+                         .Where(c => c.AppUserId == userId)
+                         .Include(c => c.Accessories)
+                         .ToListAsync();
+
+            return View(toDoItems);
+        }
+        
         // GET: ToDoItems/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -76,6 +91,7 @@ namespace CSToDoList.Controllers
             ViewData["AccessoryList"] = new MultiSelectList(accessoryList, "Id", "Name");
             return View();
         }
+
 
         // POST: ToDoItems/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
