@@ -10,9 +10,11 @@ using CSToDoList.Models;
 using Microsoft.AspNetCore.Identity;
 using CSToDoList.Services;
 using CSToDoList.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CSToDoList.Controllers
 {
+    [Authorize]
     public class ToDoItemsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -121,7 +123,7 @@ namespace CSToDoList.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", toDoItem.AppUserId);
+
             return View(toDoItem);
         }
 

@@ -7,16 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CSToDoList.Data;
 using CSToDoList.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CSToDoList.Controllers
 {
+    [Authorize]
     public class AccessoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<AppUser> _userManager;
 
-        public AccessoriesController(ApplicationDbContext context)
+        public AccessoriesController(ApplicationDbContext context, UserManager<AppUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Accessories
@@ -48,7 +53,6 @@ namespace CSToDoList.Controllers
         // GET: Accessories/Create
         public IActionResult Create()
         {
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -59,13 +63,17 @@ namespace CSToDoList.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,AppUserId,Name")] Accessory accessory)
         {
+            ModelState.Remove("AppUserId");
+            string? userId = _userManager.GetUserId(User);
+
             if (ModelState.IsValid)
             {
+                accessory.AppUserId = _userManager.GetUserId(User);
+
                 _context.Add(accessory);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", accessory.AppUserId);
             return View(accessory);
         }
 
